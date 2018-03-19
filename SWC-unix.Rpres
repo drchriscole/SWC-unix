@@ -99,7 +99,23 @@ Surprisingly no! Usually just get a (self-explanatory) error.
 
 ![mushroom cloud](713777.jpg)
 
-Is it difficult?
+Getting Help
+============================
+
+All built-in linux/unix commands come with help.
+
+There are two ways to access help. For example get help with the `ls` command:
+
+    $ ls --help
+    $ man ls
+
+The first is usually more succinct that the second.
+
+Even `man` has a manual page:
+
+    $ man man
+
+Is the linux commandline difficult?
 =================================
 incremental: true
 
@@ -139,7 +155,6 @@ Nelle Nemo, a marine biologist, has just returned from a six-month survey of the
 
 Can this be done better?
 
-
 Navigating the Filesystem
 ================================
 type: sub-section
@@ -169,7 +184,7 @@ When you first open a shell window the command prompt will be in your "home dire
 
 _pwd_ shows you the **path** to the current **working directory**.
 
-The filesystem
+The Filesystem
 ==============================
 title: false
 
@@ -180,9 +195,45 @@ The filesystem is heirarchical.
 With all files and directories being stems from the **root**, '/', at the top of the tree.
 
 
+Home Directories
+==============================
+
+All users have their own **home directory**, which form part of the filesystem heirarchy. 
+
+An individual's files will all exist within the **home directory**.
+
 ![filesystem](home-directories.svg)
 
-Exercise
+Given the above filesystem, these three users have the following **home directory** paths:
+
+    /Users/imhotep
+    /Users/larry
+    /Users/nelle
+
+Home Directories
+=============================
+
+Those paths are typical for Mac users. On Windows it may look like this (it depends on version and setup):
+
+    C:\Documents and Settings\nelle
+    C:\Users\nelle
+    
+Linux:
+
+    /home/nelle
+
+Shortcut for the homedir path is `~` (tilde) character.
+
+Listing files
+===========================
+
+`ls` - command which lists files. e.g.
+
+    $ ls 
+    $ ls -F
+
+
+Exercise - More ls Flags
 ===================================
 
 What does the command ls do when used with the `-l` and `-h` flags?
@@ -192,6 +243,89 @@ Use `man ls` to help you.
 ![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
 
 (5 min)
+
+Course Material Data
+===============================
+
+Using your computer's file manager, copy the `data-shell.zip` file from your USB drive to the Desktop and unzip it (usually double-clicking the file icon is sufficient).
+
+![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
+
+(5 min)
+
+
+Navigating Paths and Directories
+=======================
+
+`ls` will also list the contents of other directories than the current one.
+
+E.g. this will list the contents of the `Desktop` directory. On Linux and macOS this is usually a subdirectory of your home directory (or homedir).
+
+    $ ls Desktop
+    
+On windows do:
+TODO:
+    $ ls 
+
+You should see the `data-shell` directory.
+
+More Paths
+====================
+
+We can use `ls` to see more by traversing the filesystem heirarchy by specifying a **path** to the directory or file of interest.
+
+    $ ls -F Desktop/data-shell
+    
+We can also **move** to a particular by **changing directory** with the `cd` command.
+
+    $ cd Desktop
+    $ cd data-shell
+    $ cd data
+
+Path Shortcuts
+=====================
+
+If the current path is as follows
+
+    $ pwd
+    /Users/nelle/Desktop/data-shell/data
+
+How do we go **up** the directory tree?
+
+    $ cd data-shell
+    -bash: cd: data-shell: No such file or directory
+
+This doesn't work as `cd` only sees sub-directories in the current directory. We could do:
+
+    $ cd /Users/nelle/Desktop/data-shell
+
+or there's the `..` shortcut which means the **parent** of the current directory.
+
+    $ cd ..
+
+Path Shortcuts
+========================
+
+`..` is a special name and it exists in every directory which can see with:
+
+    $ ls -a -F
+    ./   .bash_profile  data/       north-pacific-gyre/  pizza.cfg  thesis/ ../  creatures/     molecules/  notes.txt            solar.pdf  writing/
+
+The `-a` flag to `ls` displays all files including special and hidden files.
+
+`.` is another special name meaning **this** directory.
+
+So what does this command do?
+
+    $ cd .
+
+Hidden files
+=======================
+
+All files or directories that start with a '.' are deemed 'hidden' and are ignored by default by `ls`. 
+
+Hidden files are usually configuration files and should be ignored. **DO NOT** delete them as they may store important information that will affect the proper running of programs.
+
 
 Exercise - Absolute vs Relative Paths
 =======================
@@ -228,19 +362,25 @@ Using the filesystem diagram below, if pwd displays `/Users/thing`, what will `l
 
 (5 min)
 
-Exercise - 
+Exercise - ls Comprehension
 =====================
+left: 55%
 
-Assuming a directory structure as in the above Figure (File System for Challenge Questions), if pwd displays `/Users/backup` , and `-r` tells `ls` to display things in reverse order, what command will display:
+![challenge](filesystem-challenge.svg)
+
+***
+Assuming a directory structure (left), if pwd displays `/Users/backup` , and `-r` tells `ls` to display things in reverse order, what command will display:
 
     pnas_sub/ pnas_final/ original/
 
-    ls pwd
-    ls -r -F
-    ls -r -F /Users/backup
-    Either #2 or #3 above, but not #1.
+1. ls pwd
+2. ls -r -F
+3. ls -r -F /Users/backup
+4. Either #2 or #3 above, but not #1.
 
 ![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
+
+(5 min)
 
 Nelle’s Pipeline: Organizing Files
 ====================================
@@ -270,20 +410,21 @@ Keep the same system for filename.
 
 The assay machine’s output is plain text, she will call her files `NENE01729A.txt`, `NENE01812A.txt`, etc. All 1520 files will go into the same directory.
 
-Now in her current directory data-shell, Nelle can see what files she has using the command:
-
 Tab autocompletion
 ==================================
+Now in her current directory data-shell, Nelle can see what files she has using the command:
 
     $ cd north-pacific-gyre/2012-07-03/
 
-This is a lot to type and gets tedious if you type it a lot, but there's short cut
+This is a lot to type and gets tedious if done a lot, but there's short cut: **tab autocompletion**
 
     $ cd nor
     [tab]
     $ cd north-pacific-gyre/
     [tab]
     2012-07-03/
+
+This works for files, directories and command names.
 
 Working with the Filesystem
 =================
@@ -298,6 +439,61 @@ type: sub-section
 * Create a directory hierarchy that matches a given diagram.
 * Create files in that hierarchy using an editor or by copying and renaming existing files.
 * Delete specified files and/or directories.
+
+Creating a Directory - mkdir
+=======================
+
+Let's make a directory for Nelle's thesis, but first make sure we're in the right place.
+
+    $ pwd
+    /Users/nelle/Desktop/data-shell
+
+Using the `mkdir` command create a `thesis` directory
+
+    $ mkdir thesis
+    $ ls -F
+    creatures/  data/  molecules/  north-pacific-gyre/  notes.txt  pizza.cfg  solar.pdf  thesis/  writing/
+
+Good names for files and directories
+==========================
+
+1. Don't use spaces
+  * whitespace is what the commandline uses to separate commands from their flags and arguments. Use `-` (dash) or `_` (underscore) instead.
+2. Don't begin a name with a `-` (dash)
+  * dashes are used for commandline flags
+3. Stick with letters, numbers, `.`, `-` and `_`.
+  * avoid any special characters (`$*%@`) as they cause serious problems.
+  
+If you files that contain the above you need to use quotes to specify the names e.g.
+
+    "a file with spaces.txt"
+
+
+File names
+====================
+
+**Bad**
+
+    My experiment 1.dat
+    -1_temp.png
+    Image$5.jpg
+
+**Good**
+
+    My_experiment.1.dat
+    temp-1.png
+    image005.jpg
+
+Creating a file
+======================
+
+Now we've got a new `thesis` directory let's create a new file in it using the `nano` editor.
+
+    $ cd thesis
+    $ nano draft.txt
+
+![nano](nano-screenshot.png)
+
 
 Exercise - creating files
 =======================
@@ -558,6 +754,8 @@ What is the output of the following code?
         ls *.pdb
     done
 
+![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
+
 Exercise - Variables in Loops
 =========================
 title: false
@@ -570,5 +768,78 @@ Now, what is the output of the following code?
     done
 
 Why do these two loops give different outputs?
+
+![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
+
+
+Exercise - Limiting Sets of Files
+============================
+
+What would be the output of running the following loop in the data-shell/molecules directory?
+
+    for filename in c*
+    do
+        ls $filename 
+    done
+
+1. No files are listed.
+2. All files are listed.
+3. Only cubane.pdb, octane.pdb and pentane.pdb are listed.
+4. Only cubane.pdb is listed.
+
+![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
+
+
+Exercise - Limiting Sets of Files 
+===========================
+title: false
+
+How would the output differ from using this command instead?
+
+    for filename in *c*
+    do
+        ls $filename 
+    done
+
+1. The same files would be listed.
+2. All the files are listed this time.
+3. No files are listed this time.
+4. The files cubane.pdb and octane.pdb will be listed.
+5. Only the file octane.pdb will be listed.
+
+![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
+
+Exercise - Saving To a File in a Loop
+=======================
+
+In the data-shell/molecules directory, what is the effect of this loop?
+
+    for alkanes in *.pdb
+    do
+        echo $alkanes
+        cat $alkanes > alkanes.pdb
+    done
+
+1. Prints cubane.pdb, ethane.pdb, methane.pdb, octane.pdb, pentane.pdb and propane.pdb, and the text from propane.pdb will be saved to a file called alkanes.pdb.
+2. Prints cubane.pdb, ethane.pdb, and methane.pdb, and the text from all three files would be concatenated and saved to a file called alkanes.pdb.
+3. Prints cubane.pdb, ethane.pdb, methane.pdb, octane.pdb, and pentane.pdb, and the text from propane.pdb will be saved to a file called alkanes.pdb.
+4. None of the above.
+
+![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
+
+Exercise - Saving To a File in a Loop
+===================
+
+Also in the data-shell/molecules directory, what would be the output of the following loop?
+
+    for datafile in *.pdb
+    do
+        cat $datafile >> all.pdb
+    done
+
+1. All of the text from cubane.pdb, ethane.pdb, methane.pdb, octane.pdb, and pentane.pdb would be concatenated and saved to a file called all.pdb.
+2. The text from ethane.pdb will be saved to a file called all.pdb.
+3. All of the text from cubane.pdb, ethane.pdb, methane.pdb, octane.pdb, pentane.pdb and propane.pdb would be concatenated and saved to a file called all.pdb.
+4. All of the text from cubane.pdb, ethane.pdb, methane.pdb, octane.pdb, pentane.pdb and propane.pdb would be printed to the screen and saved to a file called all.pdb.
 
 
