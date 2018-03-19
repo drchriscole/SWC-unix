@@ -3,6 +3,7 @@ The Unix Shell
 author: Chris Cole
 date: March 2018
 autosize: true
+css: custom.css
 
 Background
 ========================================================
@@ -139,19 +140,21 @@ Nelle Nemo, a marine biologist, has just returned from a six-month survey of the
 Can this be done better?
 
 
-Navigating Files and Directories
+Navigating the Filesystem
 ================================
+type: sub-section
 
 **Questions**
 * How can I move around on my computer?
 * How can I see what files and directories I have?
 * How can I specify the location of a file or directory on my computer?
 
+***
 **Objectives**
-* Explain the similarities and differences between a file and a directory.
+* Explain the similarities/differences between a file and a directory.
 * Translate an absolute path into a relative path and vice versa.
-* Construct absolute and relative paths that identify specific files and directories.
-* Demonstrate the use of tab completion, and explain its advantages.
+* Construct absolute and relative paths.
+* Be aware of and use tab completion.
 
 The Filesystem
 =======================
@@ -177,6 +180,395 @@ The filesystem is heirarchical.
 With all files and directories being stems from the **root**, '/', at the top of the tree.
 
 
-![filesystem](filesystem.svg)
+![filesystem](home-directories.svg)
+
+Exercise
+===================================
+
+What does the command ls do when used with the `-l` and `-h` flags?
+
+Use `man ls` to help you.
+
+![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
+
+(5 min)
+
+Exercise - Absolute vs Relative Paths
+=======================
+
+Starting from `/Users/amanda/data/`, which of the following commands could Amanda use to navigate to her home directory, which is `/Users/amanda`?
+
+    cd .
+    cd /
+    cd /home/amanda
+    cd ../..
+    cd ~
+    cd home
+    cd ~/data/..
+    cd
+    cd ..
+
+![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
+
+(5 min)
+
+Exercise - Path resolution
+===========================
+left: 55%
+
+![challenge](filesystem-challenge.svg)
+
+***
+Using the filesystem diagram below, if pwd displays `/Users/thing`, what will `ls -F ../backup` display?
+
+    ../backup: No such file or directory
+    2012-12-01 2013-01-08 2013-01-27
+    2012-12-01/ 2013-01-08/ 2013-01-27/
+    original/ pnas_final/ pnas_sub/
+
+(5 min)
+
+Exercise - 
+=====================
+
+Assuming a directory structure as in the above Figure (File System for Challenge Questions), if pwd displays `/Users/backup` , and `-r` tells `ls` to display things in reverse order, what command will display:
+
+    pnas_sub/ pnas_final/ original/
+
+    ls pwd
+    ls -r -F
+    ls -r -F /Users/backup
+    Either #2 or #3 above, but not #1.
+
+![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
+
+Nelle’s Pipeline: Organizing Files
+====================================
+
+Knowing just this much about files and directories, Nelle is ready to organize the files that the protein assay machine will create. First, she creates a directory called `north-pacific-gyre`. Inside that, she creates a directory called `2012-07-03`, which is the date she started processing the samples. 
+
+She used to use names like `conference-paper` and `revised-results`, but she found them hard to understand after a couple of years. (The final straw was when she found herself creating a directory called `revised-revised-results-3`.)
+
+Sorting Output
+===============================
+incremental: true
+
+Nelle names her directories **year-month-day**, with leading zeroes for months and days, because the shell displays file and directory names in alphabetical order. If she used month names, December would come before July; if she didn’t use leading zeroes, November (‘11’) would come before July (‘7’). Similarly, putting the year first means that June 2012 will come before June 2013.
+
+***
+**ISO 8601**
+![xkcd iso8601](XKCD_iso_8601_2x.png)
+
+Nelle's Filenaming
+================================
+
+Her lab uses a unique ten-character ID for her samples e.g. **NENE01729A** 
+
+Used to log the location, time, depth, and other characteristics of the sample.
+
+Keep the same system for filename. 
+
+The assay machine’s output is plain text, she will call her files `NENE01729A.txt`, `NENE01812A.txt`, etc. All 1520 files will go into the same directory.
+
+Now in her current directory data-shell, Nelle can see what files she has using the command:
+
+Tab autocompletion
+==================================
+
+    $ cd north-pacific-gyre/2012-07-03/
+
+This is a lot to type and gets tedious if you type it a lot, but there's short cut
+
+    $ cd nor
+    [tab]
+    $ cd north-pacific-gyre/
+    [tab]
+    2012-07-03/
+
+Working with the Filesystem
+=================
+type: sub-section
+
+**Questions**
+* How can I create, copy, and delete files and directories?
+* How can I edit files?
+
+***
+**Objectives**
+* Create a directory hierarchy that matches a given diagram.
+* Create files in that hierarchy using an editor or by copying and renaming existing files.
+* Delete specified files and/or directories.
+
+Exercise - creating files
+=======================
+
+We have seen how to create text files using the nano editor. Now, try the following command in your home directory:
+
+    $ cd                  # go to your home directory
+    $ touch my_file.txt
+
+What did the touch command do?
+Use `ls -l` to inspect the files. How large is `my_file.txt`?
+When might you want to create a file this way?
+
+![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
+
+Exercise - Safely Removing Files
+=====================
+
+What happens when we type `rm -i thesis/quotations.txt`? Why would we want this protection when using `rm`?
+
+![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
+
+Exercise - Moving Files
+=====================
+
+After running the following commands, Jamie realizes that she put the files `sucrose.dat` and `maltose.dat` into the wrong folder:
+
+    $ ls -F
+    analyzed/ raw/
+    $ ls -F analyzed
+    fructose.dat glucose.dat maltose.dat sucrose.dat
+    $ cd raw/
+
+Fill in the blanks to move these files to the current folder (i.e., the one she is currently in):
+
+    $ mv ___/sucrose.dat  ___/maltose.dat ___
+
+![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
+
+(5 min)
+
+Exercise - Renaming Files
+======================
+
+Suppose that you created a .txt file in your current directory to contain a list of the statistical tests you will need to do to analyze your data, and named it: statstics.txt
+
+After creating and saving this file you realize you misspelled the filename! You want to correct the mistake, which of the following commands could you use to do so?
+
+    cp statstics.txt statistics.txt
+    mv statstics.txt statistics.txt
+    mv statstics.txt .
+    cp statstics.txt .
+
+(5 min)
+
+Exercise 
+========================
+
+What is the output of the closing ls command in the sequence shown below?
+
+    $ pwd
+    /Users/jamie/data
+    $ ls
+    proteins.dat
+    $ mkdir recombine
+    $ mv proteins.dat recombine/
+    $ cp recombine/proteins.dat ../proteins-saved.dat
+    $ ls
+
+1. `proteins-saved.dat recombine`
+2. `recombine`
+3. `proteins.dat recombine`
+4. `proteins-saved.dat`
+
+![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
+
+(5 min)
+
+Exercise - Organising files
+=============================
+
+Jamie is working on a project and she sees that her files aren’t very well organized:
+
+    $ ls -F
+    analyzed/  fructose.dat    raw/   sucrose.dat
+
+The fructose.dat and sucrose.dat files contain output from her data analysis. What command(s) covered in this lesson does she need to run so that the commands below will produce the output shown?
+
+    $ ls -F
+    analyzed/   raw/
+    $ ls analyzed
+    fructose.dat    sucrose.dat
+
+![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
+
+(5 min)
+
+Exercise - Copying multiple files
+=======================
+
+For this exercise, you can test the commands in the `data-shell/data` directory.
+
+In the example below, what does cp do when given several filenames and a directory name?
+
+    $ mkdir backup
+    $ cp amino-acids.txt animals.txt backup/
+
+In the example below, what does cp do when given three or more file names?
+
+    $ ls -F
+    amino-acids.txt  animals.txt  backup/  elements/  morse.txt  pdb/  planets.txt salmon.txt  sunspot.txt
+
+    $ cp amino-acids.txt animals.txt morse.txt
+
+![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
+
+(5 min)
+
+Exercise - Copying a file structure
+================================
+
+You’re starting a new experiment, and would like to duplicate the file structure from your previous experiment.
+
+Assume that the file structure is in a directory called `2016-05-18-data/`, which contains directories named `raw/` and `processed/` that contain data files. The goal is to copy the file structure of the `2016-05-18-data/` directory into a directory called `2016-05-20-data/` and remove the data files from copy.
+
+Exercise - Copying a file structure
+================================
+title: false
+
+
+Which of the following set of commands would achieve this objective? What would the other commands do?
+
+    $ cp -r 2016-05-18-data/ 2016-05-20-data/
+    $ rm 2016-05-20-data/raw/*
+    $ rm 2016-05-20-data/processed/*
+
+    $ rm 2016-05-20-data/raw/*
+    $ rm 2016-05-20-data/processed/*
+    $ cp -r 2016-05-18-data/ 2016-5-20-data/
+
+    $ cp -r 2016-05-18-data/ 2016-05-20-data/
+    $ rm -r -i 2016-05-20-data/
+
+![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
+
+(5 min)
+
+Exercise - Using Wildcards
+============================
+
+When run in the molecules directory, which ls command(s) will produce this output?
+
+    ethane.pdb methane.pdb
+
+Is it?
+
+1. `ls *t*ane.pdb`
+2. `ls *t?ne.*`
+3. `ls *t??ne.pdb`
+4. `ls ethane.*`
+
+![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
+
+(5 min)
+
+Exercise - More Wildcards
+==========================
+
+Sam has a directory containing the following files:
+
+    2015-10-23-calibration.txt
+    2015-10-23-dataset1.txt
+    2015-10-23-dataset2.txt
+    2015-10-26-dataset_overview.txt
+    2015-11-23-calibration.txt
+    2015-11-23-dataset1.txt
+    2015-11-23-dataset2.txt
+    2015-11-23-dataset_overview.txt
+
+Sam wants to back up her data and send some datasets to her colleague Bob. Help Sam by filling in the blanks:
+
+    $ cp ____calibration____ /backup/calibration
+    $ cp 2015-____-____ ~/send_to_bob/all_november_files/
+    $ cp ____ ~/send_to_bob/all_datasets_created_on_a_23rd/
+
+Exercise - What does '>>' mean?
+======================
+
+What is the difference between:
+
+    $ echo hello > testfile01.txt
+
+and:
+
+    $ echo hello >> testfile02.txt
+
+Hint: Try executing each command twice in a row and then examining the output files.
+
+![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
+
+Exercise - Appending Data
+======================
+
+Consider the file data-shell/data/animals.txt. After these commands, select the answer that corresponds to the file animalsUpd.txt:
+
+    $ head -3 animals.txt > animalsUpd.txt
+    $ tail -2 animals.txt >> animalsUpd.txt
+
+1. The first three lines of animals.txt
+2. The last two lines of animals.txt
+3. The first three lines and the last two lines of animals.txt
+4. The second and third lines of animals.txt
+
+![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
+
+(5 min)
+
+Exercise - Removing Unwanted Files
+=============================
+
+Suppose you want to delete your processed data files, and only keep your raw files and processing script to save storage. The raw files end in .dat and the processed files end in .txt. Which of the following would remove all the processed data files, and only the processed data files?
+
+    rm ?.txt
+    rm *.txt
+    rm * .txt
+    rm *.*
+
+![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
+
+(5 min)
+
+Loops
+===========================
+type: sub-section
+
+**Questions**
+* How can I perform the same actions on many different files?
+
+**Objectives**
+* Write a loop that applies one or more commands to a subset of files.
+* Trace the variables during execution of the loop.
+* Explain the difference between a variable’s name and its value.
+* Explain why spaces and some punctuation characters shouldn’t be used in file names.
+* Demonstrate how to see what commands have recently been executed.
+* Re-run recently executed commands without retyping them.
+
+Exercise - Variables in Loops
+=========================
+
+This exercise refers to the `data-shell/molecules` directory. `ls` gives the following output:
+
+    cubane.pdb  ethane.pdb  methane.pdb  octane.pdb  pentane.pdb  propane.pdb
+
+What is the output of the following code?
+
+    for datafile in *.pdb
+    do
+        ls *.pdb
+    done
+
+Exercise - Variables in Loops
+=========================
+title: false
+
+Now, what is the output of the following code?
+
+    for datafile in *.pdb
+    do
+    	ls $datafile
+    done
+
+Why do these two loops give different outputs?
 
 
