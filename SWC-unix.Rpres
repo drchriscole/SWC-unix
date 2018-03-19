@@ -525,7 +525,7 @@ The editor does not leave any output on the screen after it quits, but `ls` will
 Exercise - creating files
 =======================
 
-We have seen how to create text files using the nano editor. Now, try the following command:
+We have seen how to create text files using the **notepad** editor. Now, try the following command:
 
     $ touch my_file.txt
 
@@ -756,6 +756,65 @@ Which of the following set of commands would achieve this objective? What would 
 
 (5 min)
 
+Pipes and Filters
+===================
+type: sub-section
+
+**Questions**
+* How can I combine existing commands to do new things?
+
+**Objectives**
+* Redirect a command’s output to a file.
+* Process a file instead of keyboard input using redirection.
+* Construct command pipelines with two or more stages.
+* Explain Unix’s ‘small pieces, loosely joined’ philosophy.
+
+Wildcards
+==============
+
+Let's look at the `molecules` directory.
+
+    $ cd ~/Desktop/data-shell/
+    $ ls molecules
+    cubane.pdb    ethane.pdb    methane.pdb    octane.pdb    pentane.pdb   propane.pdb
+
+These are **PDB** files which means they are **protein databank** formatted files. They contain atomic resolution molecular structures.
+
+However, they are still text files. Look at one with `less`
+
+    $ less molecules/cubane.pdb
+    
+Quit `less` by pressing `q`
+    
+Wilcards
+============
+
+Wildcards allow running commands on more than one file at a time. Here we'll use the `wc` (wordcount) command to count the number of lines in files.
+
+    $ cd molecules
+    $ wc -l *.pdb
+    20 cubane.pdb
+    12 ethane.pdb
+     9 methane.pdb
+    30 octane.pdb
+    21 pentane.pdb
+    15 propane.pdb
+    107 total
+
+***
+
+`*`  matches zero or more characters
+
+`?`  matches one character
+
+For example
+
+    $ ls *ethane.pdb
+    $ ls m?thane.pdb
+    $ ls p*.pdb
+
+
+
 Exercise - Using Wildcards
 ============================
 
@@ -794,6 +853,40 @@ Sam wants to back up her data and send some datasets to her colleague Bob. Help 
     $ cp 2015-____-____ ~/send_to_bob/all_november_files/
     $ cp ____ ~/send_to_bob/all_datasets_created_on_a_23rd/
 
+![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
+
+(5 min)
+
+
+Exercise - Removing Unwanted Files
+=============================
+
+Suppose you want to delete your processed data files, and only keep your raw files and processing script to save storage. The raw files end in .dat and the processed files end in .txt. Which of the following would remove all the processed data files, and only the processed data files?
+
+1. `rm ?.txt`
+2. `rm *.txt`
+3. `rm * .txt`
+4. `rm *.*`
+
+![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
+
+(2 min)
+
+
+
+File Redirection
+==================
+
+What if we want to save the output from a command?
+
+We **redirect** the output from the screen to a file with the `>` (greater than) symbol. Think of it like an arrow pointing left -> right sending the output from left to right.
+
+Let's redo the `wc` on the pdb files
+
+    $ wc -l *.pdb > lengths.txt
+    $ ls lengths.txt
+
+
 Exercise - What does '>>' mean?
 ======================
 
@@ -805,9 +898,20 @@ and:
 
     $ echo hello >> testfile02.txt
 
-Hint: Try executing each command twice in a row and then examining the output files.
+**Hint:** Try executing each command twice in a row and then examining the output files.
 
 ![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
+
+Examining Files - head & tail
+====================
+
+We've briefly used `less` to view a file, but sometime you just want to check the start and end of file e.g. to confirm the right format or check that the file is complete.
+
+`head` and `tail` are very useful for this and work in the same way.
+
+    $ head -3 ethane.pdb     # show first three lines
+    $ tail -1 propane.pdb    # show last two lines
+
 
 Exercise - Appending Data
 ======================
@@ -826,19 +930,24 @@ Consider the file data-shell/data/animals.txt. After these commands, select the 
 
 (5 min)
 
-Exercise - Removing Unwanted Files
-=============================
+Pipes
+===================
 
-Suppose you want to delete your processed data files, and only keep your raw files and processing script to save storage. The raw files end in .dat and the processed files end in .txt. Which of the following would remove all the processed data files, and only the processed data files?
+Pipes are by far the most powerful aspect of the linux commandline. They allow you to glue commands together to generate a /pipeline/.
 
-    rm ?.txt
-    rm *.txt
-    rm * .txt
-    rm *.*
+They are constructed with the `|` (pipe) character. The take the output of the command to the left and make it the input for the command on the right.
 
-![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
+    $ wc -l *.pdb | head -3
 
-(5 min)
+This is the same as doing this:
+
+    $ wc -l *.pdb > lengths.txt
+    $ head -3 lengths.txt
+    
+Except there's no need for the `lengths.txt` intermediary file.
+
+This is why commandline programs are written to be simple and only do one thing. Allows the creation of lightweight pipelines simply and easily.
+
 
 Loops
 ===========================
@@ -854,6 +963,44 @@ type: sub-section
 * Explain why spaces and some punctuation characters shouldn’t be used in file names.
 * Demonstrate how to see what commands have recently been executed.
 * Re-run recently executed commands without retyping them.
+
+
+Loops
+======================
+
+Up 'til now we've run single commands on one file or a set of files. Loops allow us to execute one or more commands on many files systematically.
+
+Say we want to rename multiple files in one go e.g. create a backup of our original files before we start processing them. Will it work with a simple `cp`?
+
+    $ cd ~/Desktop/data-shell/creatures
+    $ cp *.dat original-*.dat
+
+We get an error because the command expands to:
+
+    $ cp basilisk.dat unicorn.dat original-*.dat
+
+and `cp` requires that last argument when there are more than two is a directory _not_ a file.
+
+Loops
+=======================
+
+Instead, let's try a **loop**
+
+    $ for filename in basilisk.dat unicorn.dat
+    > do
+    >    head -n 3 $filename	     # Indentation aids legibility
+    > done
+
+Let's make it a bit more generic and a bit more helpful
+
+    $ for filename in *.dat
+    > do
+    >    echo $filename
+    >    head -n 3 $filename
+    > done
+
+**Note:** see how the command prompt changes to `>` whilst in the loop? That's informing us it is waiting for further instruction.
+
 
 Exercise - Variables in Loops
 =========================
@@ -871,6 +1018,8 @@ What is the output of the following code?
 
 ![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
 
+(5 min)
+
 Exercise - Variables in Loops
 =========================
 title: false
@@ -886,6 +1035,7 @@ Why do these two loops give different outputs?
 
 ![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
 
+(5 min)
 
 Exercise - Limiting Sets of Files
 ============================
@@ -904,6 +1054,7 @@ What would be the output of running the following loop in the data-shell/molecul
 
 ![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
 
+(5 min)
 
 Exercise - Limiting Sets of Files 
 ===========================
@@ -924,16 +1075,52 @@ How would the output differ from using this command instead?
 
 ![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
 
+(5 min)
+
+Combining Pipes and Loops
+============================
+
+Pipes and loops are perfectly compatible. Back in `data/creatures` do this:
+
+    $ for filename in *.dat
+    > do
+    >   echo $filename
+    >   head -n 100 $filename | tail -n 20
+    > done
+
+This will print out lines 81-100 for each of the `*.dat` files.
+
+Of Loops and Filenames
+=========================
+
+Here is an example where whitespace in a filename is seriously problematic. Imagine there are two additional files called "red dragon.dat" & "purple unicorn.dat".
+
+If we were to try and run the loop on these files like so:
+
+    $ for filename in red dragon.dat purple unicorn.dat
+    > do
+    >   head -n 100 $filename | tail -n 3
+    > done
+    head: cannot open ‘red’ for reading: No such file or directory
+    head: cannot open ‘dragon.dat’ for reading: No such file or directory
+    head: cannot open ‘purple’ for reading: No such file or directory
+    CGGTACCGAA
+    AAGGGTCGCG
+    CAAGTGTTCC
+
+The `for` loop thinks there are **four** files not _two_ as we expected and it ends up working on the `unicorn.dat` file, which is not what we wanted.
+
+
 Exercise - Saving To a File in a Loop
 =======================
 
-In the data-shell/molecules directory, what is the effect of this loop?
+In the `data-shell/molecules` directory, what is the effect of this loop?
 
-    for alkanes in *.pdb
-    do
-        echo $alkanes
-        cat $alkanes > alkanes.pdb
-    done
+    $ for alkanes in *.pdb
+    > do
+    >    echo $alkanes
+    >    cat $alkanes > alkanes.pdb
+    > done
 
 1. Prints cubane.pdb, ethane.pdb, methane.pdb, octane.pdb, pentane.pdb and propane.pdb, and the text from propane.pdb will be saved to a file called alkanes.pdb.
 2. Prints cubane.pdb, ethane.pdb, and methane.pdb, and the text from all three files would be concatenated and saved to a file called alkanes.pdb.
@@ -942,19 +1129,80 @@ In the data-shell/molecules directory, what is the effect of this loop?
 
 ![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
 
+(5 min)
+
 Exercise - Saving To a File in a Loop
 ===================
 
 Also in the data-shell/molecules directory, what would be the output of the following loop?
 
-    for datafile in *.pdb
-    do
-        cat $datafile >> all.pdb
-    done
+    $ for datafile in *.pdb
+    > do
+    >    cat $datafile >> all.pdb
+    > done
 
 1. All of the text from cubane.pdb, ethane.pdb, methane.pdb, octane.pdb, and pentane.pdb would be concatenated and saved to a file called all.pdb.
 2. The text from ethane.pdb will be saved to a file called all.pdb.
 3. All of the text from cubane.pdb, ethane.pdb, methane.pdb, octane.pdb, pentane.pdb and propane.pdb would be concatenated and saved to a file called all.pdb.
 4. All of the text from cubane.pdb, ethane.pdb, methane.pdb, octane.pdb, pentane.pdb and propane.pdb would be printed to the screen and saved to a file called all.pdb.
 
+Back to the Orignal Problem
+=================================
+
+How to cp all the original `.dat` files with a loop?
+
+    $ cd ~/Desktop/data-shell/creatures
+    $ for file in *.dat
+    > do
+    >   echo $file
+    >   cp $file original-$file
+    > done
+
+Dry Runs
+===========================
+
+It is always a good idea to have a 'dry run' before committing to a significant command. With **loops** the way to do that is to `echo` the command:
+
+    $ for file in *.dat
+    > do
+    >   echo $file
+    >   echo "cp $file original-$file"
+    > done
+
+*Always* use quote marks `"` when echoing commands. It avoids potential problems. e.g. what's wrong here?
+
+    $ for datafile in *.dat
+    > do
+    >    echo cat $datafile >> all.dat
+    > done
+
+![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
+
+(5 min)
+
+
+What About Nelle's Data?
+============================
+
+Now, can we help do her `goostats` analysis in time to write her paper???
+
+Let's do this togther...
+
+    $ cd ../north-pacific-gyre/2012-07-03
+    $ for file in NENE*.txt
+    > do
+    >    echo $file
+    > done
+
+
+Answer
+============================
+
+This is one way to do it.
+
+    $ for f in NENE*.txt
+    > do 
+    >    echo $f
+    >    sh goostats $f stats-$f
+    > done
 
