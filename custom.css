@@ -3,3 +3,8 @@
   color: #3d90d9;
   background-color: #e7e7e7;
 }
+
+.reveal img {
+  max-width: 70%;
+
+}
