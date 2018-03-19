@@ -4,6 +4,9 @@ author: Chris Cole
 date: March 2018
 autosize: true
 css: custom.css
+width: 1920
+height: 1080
+
 
 Background
 ========================================================
@@ -247,7 +250,13 @@ Use `man ls` to help you.
 Course Material Data
 ===============================
 
-Using your computer's file manager, copy the `data-shell.zip` file from your USB drive to the Desktop and unzip it (usually double-clicking the file icon is sufficient).
+On the IT suite computers copy the `data-shell.zip` file from your USB drive to the **Desktop** folder on your **H: drive**.
+
+Then extract it using **7-Zip** menu item:
+
+![unzip](extract_zip.PNG)
+
+Everyone else, using your computer's file manager, copy the `data-shell.zip` file from your USB drive to the Desktop and unzip it (usually double-clicking the file icon is sufficient).
 
 ![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
 
@@ -259,14 +268,10 @@ Navigating Paths and Directories
 
 `ls` will also list the contents of other directories than the current one.
 
-E.g. this will list the contents of the `Desktop` directory. On Linux and macOS this is usually a subdirectory of your home directory (or homedir).
+E.g. this will list the contents of the `Desktop` directory. On most computers this is usually a subdirectory of your home directory (or homedir).
 
     $ ls Desktop
     
-On windows do:
-TODO:
-    $ ls 
-
 You should see the `data-shell` directory.
 
 More Paths
@@ -324,7 +329,9 @@ Hidden files
 
 All files or directories that start with a '.' are deemed 'hidden' and are ignored by default by `ls`. 
 
-Hidden files are usually configuration files and should be ignored. **DO NOT** delete them as they may store important information that will affect the proper running of programs.
+Hidden files are usually configuration files and should be ignored. 
+
+**DO NOT** delete them as they may store important information that will affect the proper running of programs.
 
 
 Exercise - Absolute vs Relative Paths
@@ -348,11 +355,9 @@ Starting from `/Users/amanda/data/`, which of the following commands could Amand
 
 Exercise - Path resolution
 ===========================
-left: 55%
 
 ![challenge](filesystem-challenge.svg)
 
-***
 Using the filesystem diagram below, if pwd displays `/Users/thing`, what will `ls -F ../backup` display?
 
     ../backup: No such file or directory
@@ -364,11 +369,9 @@ Using the filesystem diagram below, if pwd displays `/Users/thing`, what will `l
 
 Exercise - ls Comprehension
 =====================
-left: 55%
 
 ![challenge](filesystem-challenge.svg)
 
-***
 Assuming a directory structure (left), if pwd displays `/Users/backup` , and `-r` tells `ls` to display things in reverse order, what command will display:
 
     pnas_sub/ pnas_final/ original/
@@ -484,23 +487,46 @@ File names
     temp-1.png
     image005.jpg
 
-Creating a file
+Creating a file - Setting up Your Editor
 ======================
+incremental: true
 
-Now we've got a new `thesis` directory let's create a new file in it using the `nano` editor.
+Depending on your setup (and what you've installed) you have the option of **notepad++**, **nano** or if you're feeling adventurous **vim**.
 
-    $ cd thesis
-    $ nano draft.txt
+On the IT suite computers and if you have Windows you need to do this to get **notepad++** working on the commandline.
 
-![nano](nano-screenshot.png)
+    $ echo 'alias notepad="/c/Program\ Files/Notepad++/notepad++.exe"' >> ~/.bashrc
+
+Then restart **git-bash**.
+
+On your own machine there's nothing to do if you have a Mac or Linux - just use `nano`.
+
+Creating a file
+=====================
+
+Now we've got a new `thesis` directory let's create a new file in it using an editor.
+
+    $ cd ~/Desktop/data-shell/thesis
+    $ notepad draft.txt
+
+Enter some text and press `Ctrl-S` (or click the save icon) to save it.
+
+Exit **notepad++**
+
+Creating a file
+=======================
+
+The editor does not leave any output on the screen after it quits, but `ls` will show that we have created a new file called `draft.txt`
+
+    $ ls
+    draft.txt
 
 
 Exercise - creating files
 =======================
 
-We have seen how to create text files using the nano editor. Now, try the following command in your home directory:
+We have seen how to create text files using the nano editor. Now, try the following command:
 
-    $ cd                  # go to your home directory
     $ touch my_file.txt
 
 What did the touch command do?
@@ -509,12 +535,74 @@ When might you want to create a file this way?
 
 ![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
 
+
+Deleting Files
+=====================
+incremental: true
+
+Let's delete a file.
+
+    $ pwd
+    /Users/nelle/Desktop/data-shell/thesis
+    $ rm draft.txt
+    $ ls
+    my_file.txt
+
+OK. That worked. Great. Now let's try and remove the entire `thesis` directory.
+
+    $ cd ..
+    $ rm thesis
+    rm: cannot remove `thesis': Is a directory
+
+***
+Hmm. `rm` only works with files. Try `rmdir` instead.
+
+    $ rmdir thesis
+    rmdir: thesis/: Directory not empty
+
+We need to do a _recursive_ deletion of the directory
+
+    $ rm -r thesis
+
+
 Exercise - Safely Removing Files
 =====================
+
+Create the file `thesis/quotations.txt`.
 
 What happens when we type `rm -i thesis/quotations.txt`? Why would we want this protection when using `rm`?
 
 ![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
+
+(5 min)
+
+Deleting Files is Forever
+=========================
+
+`rm` is completely destructive and there is no **Trashcan** or **undo**.
+
+Once a file or directory is deleted it is **GONE**. 
+
+[insert lecture about backing up]
+
+Moving Files 
+=====================
+
+Let's recreate `thesis/draft.txt`.
+
+    $ touch thesis/draft.txt
+
+However, we now don't like that filename we can rename it with the `mv` (move) command.
+
+    $ mv thesis/draft.txt thesis/quotes.txt
+    $ ls thesis
+    draft.txt  quotes.txt
+
+What happens when we move it to the current directory.
+
+    $ mv thesis/quotes.txt .
+    $ ls thesis
+    
 
 Exercise - Moving Files
 =====================
@@ -535,6 +623,34 @@ Fill in the blanks to move these files to the current folder (i.e., the one she 
 
 (5 min)
 
+Copying Files
+===================
+
+Copying files is done in a very similar way to moving, using the `cp` command.
+
+    $ cp quotes.txt thesis/quotations.txt
+    $ ls quotes.txt thesis/quotations.txt
+    quotes.txt   thesis/quotations.txt
+    
+We can now delete `quotes.txt` to prove that indeed we made a copy.
+
+    $ rm quotes.txt
+    $ ls quotes.txt thesis/quotations.txt
+    ls: cannot access quotes.txt: No such file or directory
+    thesis/quotations.txt
+
+What's In A Name?
+=======================
+
+You'll have noticed that all the files we have used are **something dot something** and most files we've used have ended in `.txt` meaning they are **text** files. 
+
+That is just a convention. They could be named anything and it wouldn't change what they are e.g. `my.thesis.file` or simply `mythesis_version_20180320`
+
+Extensions like `pdf`, `png` or `mp3` are simply descriptors and adding them to the end of files doesn't magically turn the file into a **PDF** or an **image** or some **music**.
+
+It's the content of the file that matters.
+
+
 Exercise - Renaming Files
 ======================
 
@@ -546,6 +662,9 @@ After creating and saving this file you realize you misspelled the filename! You
     mv statstics.txt statistics.txt
     mv statstics.txt .
     cp statstics.txt .
+
+![Stickies](https://raw.githubusercontent.com/widdowquinn/2017-01-09-dundee/gh-pages/lessons-dundee/R_reproducible_analysis/images/red_green_sticky.png)
+
 
 (5 min)
 
@@ -619,11 +738,7 @@ You’re starting a new experiment, and would like to duplicate the file structu
 
 Assume that the file structure is in a directory called `2016-05-18-data/`, which contains directories named `raw/` and `processed/` that contain data files. The goal is to copy the file structure of the `2016-05-18-data/` directory into a directory called `2016-05-20-data/` and remove the data files from copy.
 
-Exercise - Copying a file structure
-================================
-title: false
-
-
+***
 Which of the following set of commands would achieve this objective? What would the other commands do?
 
     $ cp -r 2016-05-18-data/ 2016-05-20-data/
