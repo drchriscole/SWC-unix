@@ -596,7 +596,7 @@ However, we now don't like that filename we can rename it with the `mv` (move) c
 
     $ mv thesis/draft.txt thesis/quotes.txt
     $ ls thesis
-    draft.txt  quotes.txt
+    quotes.txt
 
 What happens when we move it to the current directory.
 
